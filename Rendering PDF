@@ -1,0 +1,55 @@
+//Rendering the paf in IBM BPM Coach
+
+Step1: Place a CV having Button in layout
+Step2: Click on AMD Dependencies  and Module ID : dojo/on  and Alias : on
+Step3 : Create a variable for byteStream string
+Step4: var configOptions=this.context.options;
+var filesttext =this.context.options.variable.get("value");
+         
+         
+var buttonElement = this.context.element.getElementsByTagName("button")[0];
+       buttonElement.innerHTML = this.context.options._metadata.label.get("value");
+
+     on(buttonElement,"click",function(event){
+                
+           renderPDF(filesttext);
+     });
+
+
+function b64toBlob(b64Data, contentType)
+{
+    	contentType = contentType || '';
+    	var sliceSize = 512;
+    	b64Data = b64Data.replace(/^[^,]+,/, '');
+    	b64Data = b64Data.replace(/\s/g, '');
+    	var byteCharacters = window.atob(b64Data);
+    	var byteArrays = [];
+    
+    	for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    		var slice = byteCharacters.slice(offset, offset + sliceSize);
+    
+    		var byteNumbers = new Array(slice.length);
+    		for (var i = 0; i < slice.length; i++) {
+    			byteNumbers[i] = slice.charCodeAt(i);
+    		}
+    
+    		var byteArray = new Uint8Array(byteNumbers);
+    
+    		byteArrays.push(byteArray);
+    }
+    
+    var blob = new Blob(byteArrays, {type: contentType});
+    return blob;
+}
+  
+function renderPDF(bytearray)
+{
+    var pdfBlob = b64toBlob(bytearray,'application/pdf');
+    	if (window.navigator && window.navigator.msSaveOrOpenBlob){
+            window.navigator.msSaveOrOpenBlob(pdfBlob);
+    	}
+    	else{
+    		var objectUrl = URL.createObjectURL(pdfBlob);
+    		window.open(objectUrl);
+    	}
+}
